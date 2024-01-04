@@ -23,6 +23,7 @@ self.addEventListener('install', (event) => {
             '/index.html',
             '/manifest.json',
             '/logo.png',
+            '/style.css'
             // Add other assets you want to cache
          ]);
       })
@@ -32,7 +33,14 @@ self.addEventListener('install', (event) => {
 self.addEventListener('fetch', (event) => {
    event.respondWith(
       caches.match(event.request).then((response) => {
-         return response || fetch(event.request);
+         if (response) {
+            return response;
+         }
+         console.log('Fetching from network:', event.request.url);
+         return fetch(event.request).catch(() => {
+            console.log('You\'re offline!');
+            return new Response('You\'re offline!');
+         });
       })
    );
 });
